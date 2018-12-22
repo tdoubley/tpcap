@@ -52,6 +52,18 @@ void tpcap_print(void *handle) {
     return;
 }
 
+void tpcap_print_tcp(void *handle) {
+    if (handle == NULL) {
+        return;
+    }
+
+    pcap_t *pcap = (pcap_t *)handle;
+    pcap_print_tcp(pcap);
+
+    return;
+}
+
+
 
 
 

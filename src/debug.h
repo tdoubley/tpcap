@@ -1,7 +1,7 @@
 #ifndef _HEADERS_DEBUG_H_
 #define _HEADERS_DEBUG_H_
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #define DEBUG_PRINT(fmt, ...) \
