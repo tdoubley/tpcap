@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 
+
+#include "src/pcap/protocol.h"
 #include "tpcap/tpcap.h"
 #include "src/pcap/pcap_parser.h"
 
@@ -47,22 +49,10 @@ void tpcap_print(void *handle) {
     }
 
     pcap_t *pcap = (pcap_t *)handle;
-    pcap_out(pcap);
+    pcap_print(pcap);
 
     return;
 }
-
-void tpcap_print_tcp(void *handle) {
-    if (handle == NULL) {
-        return;
-    }
-
-    pcap_t *pcap = (pcap_t *)handle;
-    pcap_print_tcp(pcap);
-
-    return;
-}
-
 
 
 

@@ -1,9 +1,7 @@
 #ifndef _HEADERS_DEBUG_H_
 #define _HEADERS_DEBUG_H_
 
-#define DEBUG
-
-#ifdef DEBUG
+#ifndef NO_DEBUG
 #define DEBUG_PRINT(fmt, ...) \
     do { \
         printf(fmt, __VA_ARGS__); \
@@ -14,7 +12,7 @@
     }while(0)
 #endif
 
-#ifdef DEBUG
+#ifndef NO_DEBUG
 #define DEBUG_ASSERT(s) \
     do { \
         if (!s) { \

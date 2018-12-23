@@ -18,7 +18,9 @@ noinst_HEADERS = \
 
 
 PCAP = \
-    pcap/pcap_parser.c
+    pcap/pcap_parser.c \
+	pcap/protocol.c \
+	pcap/pcap.c
 
 UTILS = 
 
