@@ -50,7 +50,8 @@ AC_SUBST(GLOBAL_CFLAGS)
 AC_CONFIG_FILES([\
     Makefile \
     src/Makefile \
-	test/Makefile
+    others/Makefile \
+    test/Makefile
     ])
 
 

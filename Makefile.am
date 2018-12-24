@@ -2,6 +2,7 @@
 ACLOCAL_AMFLAGS = -I build
 
 SUBDIRS = \
+	others \
 	src \
 	test
 
