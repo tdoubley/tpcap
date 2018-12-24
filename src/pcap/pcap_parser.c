@@ -11,34 +11,6 @@
 
 #include "src/pcap/pcap_parser.h"
 
-int pcap_init(pcap_t **ppcap) {
-    if (ppcap == NULL) {
-        return -1;
-    }
-
-    pcap_t *pcap = (pcap_t *)malloc(sizeof(pcap_t));
-    if (pcap == NULL) {
-        return -1;
-    }
-    memset(pcap, 0, sizeof(pcap_t));
-    *ppcap = pcap;
-
-    DEBUG_PRINT("%s", "pcap initial\n");
-
-    return 0;
-}
-
-int pcap_finish(pcap_t *pcap) {
-    if (pcap == NULL) {
-        return -1;
-    }
-
-    pcap_free(pcap->packets);
-
-    DEBUG_PRINT("%s", "pcap finished\n");
-
-    return 0;
-}
 
 int pcap_parser(pcap_t *pcap, const char *path) {
     FILE *fp = fopen(path, "rw");
@@ -332,11 +304,13 @@ void pcap_free_node(pcap_packet_node_t* packet_node) {
     free(packet_node);
 }
 
-void pcap_free(pcap_packet_node_t* head) {
+int pcap_free(pcap_packet_node_t* head) {
     pcap_packet_node_t *node = NULL;
     pcap_packet_node_t *tmp = NULL;
 
     LL_FOREACH_SAFE(head, node, tmp) {
         pcap_free_node(node);
     }
+
+    return 0;
 }

@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
-
+#include "src/debug.h"
 #include "src/pcap/protocol.h"
 #include "tpcap/tpcap.h"
 #include "src/pcap/pcap_parser.h"
@@ -13,13 +13,16 @@ int tpcap_create(void **handle) {
         return -1;
     }
 
-    pcap_t *pcap;
-    if (pcap_init(&pcap) == 0) {
-        *handle = pcap;
-        return 0;
-    } else {
+    pcap_t *pcap = (pcap_t *)malloc(sizeof(pcap_t));
+    if (pcap == NULL) {
         return -1;
     }
+    memset(pcap, 0, sizeof(pcap_t));
+    *handle = pcap;
+
+    DEBUG_PRINT("%s", "pcap create\n");
+
+    return 0;
 }
 
 int tpcap_delete(void *handle) {
@@ -28,7 +31,9 @@ int tpcap_delete(void *handle) {
     }
 
     pcap_t *pcap = (pcap_t *)handle;
-    pcap_finish(pcap);
+    pcap_free(pcap->packets);
+
+    DEBUG_PRINT("%s", "pcap finished\n");
 
     return 0;
 }
