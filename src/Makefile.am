@@ -14,20 +14,24 @@ pkginclude_HEADERS = \
 noinst_HEADERS = \
 	utils/*.h \
 	pcap/*.h \
+    protocol/*.h
 	*.h
 
 
 PCAP = \
     pcap/pcap_parser.c \
-	pcap/protocol.c \
 	pcap/pcap.c
+    
+PROTOCOL = \
+    protocol/protocol.c
 
 UTILS = 
 
 libtpcap_la_SOURCES = \
 	tpcap.c \
-	$(PCAP)
-	${UTILS}
+	$(PCAP) \
+    $(PROTOCOL)
+	$(UTILS)
 
 
 libtpcap_la_CFLAGS = 

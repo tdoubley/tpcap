@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "src/debug.h"
-#include "src/pcap/protocol.h"
+#include "src/protocol/protocol.h"
 #include "tpcap/tpcap.h"
 #include "src/pcap/pcap_parser.h"
 

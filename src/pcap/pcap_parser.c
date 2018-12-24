@@ -5,7 +5,6 @@
 
 #include "debug.h"
 
-#include "src/pcap/protocol.h"
 #include "src/pcap/pcap.h"
 #include "src/utils/utlist.h"
 

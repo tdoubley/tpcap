@@ -5,7 +5,7 @@
 
 #include <netinet/in.h>
 
-#include "src/pcap/protocol.h"
+#include "src/protocol/protocol.h"
 
 inline void eth_header_ntoh(eth_header_t *header) {
     header->proto = ntohs(header->proto);

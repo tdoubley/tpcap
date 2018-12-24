@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 #include "src/pcap/pcap.h"
-#include "src/pcap/protocol.h"
+#include "src/protocol/protocol.h"
 
 
 int pcap_parser(pcap_t *pcap, const char *path);

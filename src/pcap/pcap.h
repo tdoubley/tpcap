@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "src/pcap/protocol.h"
+#include "src/protocol/protocol.h"
 
 /*
  Pcap文件头24B各字段说明：

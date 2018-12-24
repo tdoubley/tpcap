@@ -1,5 +1,5 @@
-#ifndef _PROTOCOL_H_
-#define _PROTOCOL_H_
+#ifndef _SRC_PROTOCOL_PROTOCOL_H_
+#define _SRC_PROTOCOL_PROTOCOL_H_
 
 //#ifndef LITTLE_ENDIAN  
 //#define LITTLE_ENDIAN   (1)   //BYTE ORDER  
@@ -121,4 +121,4 @@ void udp_header_print(udp_header_t *header);
 
 
 
-#endif // _PROTOCOL_H_
+#endif // _SRC_PROTOCOL_PROTOCOL_H_
