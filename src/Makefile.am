@@ -38,10 +38,12 @@ libtpcap_la_CPPFLAGS = \
 	-g \
 	-fPIC \
 	-O3 \
-	-I../headers
+	-I../headers \
+    $(TPCAP_NO_DEBUG)
 
 
 libtpcap_la_LDFLAGS =
+    
 
 
 libtpcap_la_LIBADD = 
