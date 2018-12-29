@@ -1,4 +1,4 @@
-lib_LTLIBRARIES=libtpcap.la
+lib_LTLIBRARIES = libtpcap.la
 libtpcap_ladir = $(prefix)/include
 
 
@@ -14,23 +14,24 @@ pkginclude_HEADERS = \
 noinst_HEADERS = \
 	utils/*.h \
 	pcap/*.h \
-    protocol/*.h
+        protocol/*.h \
 	*.h
 
 
 PCAP = \
     pcap/pcap_parser.c \
-	pcap/pcap.c
+    pcap/pcap.c
     
 PROTOCOL = \
-    protocol/protocol.c
+    protocol/protocol.c \
+    protocol/http.c
 
 UTILS = 
 
 libtpcap_la_SOURCES = \
 	tpcap.c \
 	$(PCAP) \
-    $(PROTOCOL)
+        $(PROTOCOL) \
 	$(UTILS)
 
 
@@ -44,7 +45,7 @@ libtpcap_la_CPPFLAGS = \
 	-O3 \
 	-I../others \
 	-I../headers \
-    $(TPCAP_NO_DEBUG)
+        $(TPCAP_NO_DEBUG)
 
 
 libtpcap_la_LDFLAGS =
