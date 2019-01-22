@@ -24,7 +24,8 @@ PCAP = \
     
 PROTOCOL = \
     protocol/protocol.c \
-    protocol/http.c
+    protocol/http.c \
+    protocol/app_proto.c
 
 UTILS = 
 

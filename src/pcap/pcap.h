@@ -64,6 +64,7 @@ typedef struct pcap_packet_header{
 typedef struct pcap_packet_node {
     pcap_packet_header_t header;
     u_char  *data;
+    uint32_t len;
     struct pcap_packet_node *next;
 }pcap_packet_node_t;
 
@@ -71,6 +72,7 @@ typedef struct pcap_packet_node {
 typedef struct eth_packet_node {
     eth_header_t *header;
     u_char *pdata;
+    uint32_t len;
     struct eth_packet_node *next;
 }eth_packet_node_t;
 
@@ -78,6 +80,7 @@ typedef struct eth_packet_node {
 typedef struct ip_packet_node {
     ip_header_t *header;
     u_char      *pdata;
+    uint32_t     len;
     struct ip_packet_node *next;
 }ip_packet_node_t;
 
@@ -85,6 +88,7 @@ typedef struct ip_packet_node {
 typedef struct tcp_packet_node {
     tcp_header_t *header;
     u_char       *pdata;
+    uint32_t      len;
     struct tcp_packet_node *next;
 }tcp_packet_node_t;
 
@@ -92,6 +96,7 @@ typedef struct tcp_packet_node {
 typedef struct udp_packet_node {
     udp_header_t *header;
     u_char       *pdata;
+    uint32_t      len;
     struct udp_packet_node *next;
 }udp_packet_node_t;
 

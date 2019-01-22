@@ -9,7 +9,25 @@
 #include "src/utils/utlist.h"
 
 #include "src/pcap/pcap_parser.h"
+#include "src/protocol/app_proto.h"
 
+
+static int eth_analyse(pcap_t *pcap, u_char *packet, uint32_t len, eth_packet_node_t *eth_packet);
+static int ip_analyse(pcap_t *pcap, u_char *packet, uint32_t len, ip_packet_node_t *ip_packet);
+static int tcp_analyse(pcap_t *pcap, u_char *packet, uint32_t len, tcp_packet_node_t *tcp_packet);
+static int udp_analyse(pcap_t *pcap, u_char *packet, uint32_t len, udp_packet_node_t *udp_packet);
+static void pcap_free_node(pcap_packet_node_t* packet_node);
+static void print_arr(char *prefix, u_char *data, uint32_t len)
+{
+    return ;
+    printf("=====================%s=======================\n", prefix);
+    int i = 0;
+
+    for (i = 0; i < len; i++) {
+        printf("%02x", data[i]);
+    }
+    printf("\n================================================\n");
+}
 
 int pcap_parser(pcap_t *pcap, const char *path) {
     FILE *fp = fopen(path, "rw");
@@ -70,14 +88,12 @@ int pcap_parser(pcap_t *pcap, const char *path) {
             break;
         } else {
             packet_node->data = buf;
+            packet_node->len = read_count;
         }
 
         packet_count++;
 
-        LL_PREPEND(pcap->packets, packet_node);
-        //LL_APPEND(pcap->packets, packet_node);
-        //free(packet_node->data);
-        //free(packet_node);
+        LL_APPEND(pcap->packets, packet_node);
     }
 
     return packet_count;
@@ -93,9 +109,9 @@ int pcap_analyse(pcap_t *pcap) {
         /* ethernet报文解析 */
         eth_packet_node_t *peth_packet = malloc(sizeof(eth_packet_node_t));
         memset(peth_packet, 0, sizeof(eth_packet_node_t));
-        int ret = eth_analyse(pcap, node->data, peth_packet);
+        int ret = eth_analyse(pcap, node->data, node->len, peth_packet);
         if (ret == 0) { /* 解析成功添加Ethernet链表 */
-            LL_PREPEND(pcap->eth_packets, peth_packet);
+            LL_APPEND(pcap->eth_packets, peth_packet);
             pcap->eth_packet_count++;
         } else {
             free(peth_packet);
@@ -105,7 +121,7 @@ int pcap_analyse(pcap_t *pcap) {
     return 0;
 }
 
-int eth_analyse(pcap_t *pcap, u_char *packet, eth_packet_node_t *eth_packet) {
+static int eth_analyse(pcap_t *pcap, u_char *packet, uint32_t len, eth_packet_node_t *eth_packet) {
     DEBUG_PRINT("%s\n", "ethernet analyse");
 
     eth_header_t *header = (eth_header_t *)packet;
@@ -117,6 +133,10 @@ int eth_analyse(pcap_t *pcap, u_char *packet, eth_packet_node_t *eth_packet) {
     eth_packet->header = header;
     /* data */
     eth_packet->pdata = (packet + ETH_HEADER_LENGTH);
+    eth_packet->len   = len - ETH_HEADER_LENGTH;
+
+    
+
 
     switch (header->proto) {
         case ETH_P_ARP:
@@ -126,9 +146,10 @@ int eth_analyse(pcap_t *pcap, u_char *packet, eth_packet_node_t *eth_packet) {
         {
             ip_packet_node_t *pip_packet = (ip_packet_node_t *)malloc(sizeof(ip_packet_node_t));
             memset(pip_packet, 0, sizeof(ip_packet_node_t));
-            int ret = ip_analyse(pcap, eth_packet->pdata, pip_packet);
+            print_arr("ippacket", eth_packet->pdata, eth_packet->len);
+            int ret = ip_analyse(pcap, eth_packet->pdata, eth_packet->len, pip_packet);
             if (ret == 0) { /* 解析成功添加IP链表中 */
-                LL_PREPEND(pcap->ip_packets , pip_packet);
+                LL_APPEND(pcap->ip_packets , pip_packet);
                 pcap->ip_packet_count++;
             }
         }
@@ -147,7 +168,7 @@ int eth_analyse(pcap_t *pcap, u_char *packet, eth_packet_node_t *eth_packet) {
 }
 
 
-int ip_analyse(pcap_t *pcap, u_char *packet, ip_packet_node_t *ip_packet) {
+static int ip_analyse(pcap_t *pcap, u_char *packet, uint32_t len, ip_packet_node_t *ip_packet) {
     DEBUG_PRINT("%s\n", "pcap IP analyse");
 
     ip_header_t *header = (ip_header_t *)packet;
@@ -162,6 +183,7 @@ int ip_analyse(pcap_t *pcap, u_char *packet, ip_packet_node_t *ip_packet) {
         //带有OPTIONS的IP header暂不处理
     } else {
         ip_packet->pdata = (packet + IP_HEADER_LENGTH - 4); /* 减去OPTIONS的长度 */
+        ip_packet->len = len - (IP_HEADER_LENGTH - 4);
     }
 
     switch (header->proto) {
@@ -171,9 +193,10 @@ int ip_analyse(pcap_t *pcap, u_char *packet, ip_packet_node_t *ip_packet) {
             
             tcp_packet_node_t *ptcp_packet = (tcp_packet_node_t *)malloc(sizeof(tcp_packet_node_t));
             memset(ptcp_packet, 0, sizeof(tcp_packet_node_t));
-            int ret = tcp_analyse(pcap, ip_packet->pdata, ptcp_packet);
+            print_arr("tcppacket", ip_packet->pdata, ip_packet->len);
+            int ret = tcp_analyse(pcap, ip_packet->pdata, ip_packet->len, ptcp_packet);
             if (ret == 0) { /* 解析成功添加TCP链表中 */
-                LL_PREPEND(pcap->tcp_packets, ptcp_packet);
+                LL_APPEND(pcap->tcp_packets, ptcp_packet);
                 pcap->tcp_packet_count++;
             }
         }
@@ -183,7 +206,7 @@ int ip_analyse(pcap_t *pcap, u_char *packet, ip_packet_node_t *ip_packet) {
             DEBUG_PRINT("%s\n", "UDP packet analyse");
 
             udp_packet_node_t *pudp_packet = (udp_packet_node_t *)malloc(sizeof(udp_packet_node_t));
-            int ret = udp_analyse(pcap, ip_packet->pdata, pudp_packet);
+            int ret = udp_analyse(pcap, ip_packet->pdata, ip_packet->len, pudp_packet);
             if (ret == 0) { /* 解析成功添加UDP链表中 */
                 LL_APPEND(pcap->udp_packets, pudp_packet);
                 pcap->udp_packet_count++;
@@ -197,7 +220,7 @@ int ip_analyse(pcap_t *pcap, u_char *packet, ip_packet_node_t *ip_packet) {
     return 0;
 }
 
-int tcp_analyse(pcap_t *pcap, u_char *packet, tcp_packet_node_t *tcp_packet) {
+static int tcp_analyse(pcap_t *pcap, u_char *packet, uint32_t len, tcp_packet_node_t *tcp_packet) {
     DEBUG_PRINT("%s\n", "pcap TCP analyse");
 
     tcp_header_t *header = (tcp_header_t *)packet;
@@ -209,11 +232,27 @@ int tcp_analyse(pcap_t *pcap, u_char *packet, tcp_packet_node_t *tcp_packet) {
     tcp_packet->header = header;
     /* data */
     tcp_packet->pdata = (packet + TCP_HEADER_LENGTH);
+    tcp_packet->len   = len - TCP_HEADER_LENGTH;
 
+    /* 应用层协议处理 */
+    print_arr("apppacket", tcp_packet->pdata, tcp_packet->len);
+    APP_PROTOCOL_E type = tcp_app_proto_recognize(header, tcp_packet->pdata, tcp_packet->len);
+    switch (type)
+    {
+         case APP_PROTO_NONE:
+             break;
+         case APP_PROTO_HTTP:
+             do_http_parser(tcp_packet->pdata, tcp_packet->len);
+             break;
+         case APP_PROTO_MAX:
+         default:
+             DEBUG_ASSERT(0);
+             break;
+    }
     return 0;
 }
 
-int udp_analyse(pcap_t *pcap, u_char *packet, udp_packet_node_t *udp_packet) {
+static int udp_analyse(pcap_t *pcap, u_char *packet, uint32_t len, udp_packet_node_t *udp_packet) {
     DEBUG_PRINT("%s\n", "pcap UDP analyse");
 
     udp_header_t *header = (udp_header_t *)packet;
@@ -224,7 +263,8 @@ int udp_analyse(pcap_t *pcap, u_char *packet, udp_packet_node_t *udp_packet) {
     /* header */
     udp_packet->header = header;
     /* data */
-    udp_packet->pdata = (packet + TCP_HEADER_LENGTH);
+    udp_packet->pdata = (packet + UDP_HEADER_LENGTH);
+    udp_packet->len   = len - UDP_HEADER_LENGTH;
 
     return 0;
 }
@@ -291,7 +331,7 @@ void pcap_udp_print(pcap_t *pcap) {
     return;
 }
 
-void pcap_free_node(pcap_packet_node_t* packet_node) {
+static void pcap_free_node(pcap_packet_node_t* packet_node) {
     if (packet_node == NULL) {
         return;
     }
