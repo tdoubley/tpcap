@@ -8,7 +8,7 @@
 #include "src/pcap/pcap.h"
 #include "src/protocol/protocol.h"
 
-
+pcap_t *pcap_init();
 int pcap_parser(pcap_t *pcap, const char *path);
 int pcap_analyse(pcap_t *pcap);
 int pcap_free(pcap_packet_node_t* head);

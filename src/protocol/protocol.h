@@ -24,6 +24,12 @@
 #define IP_P_IPv6   41
 #define IP_P_OSPF   89
 
+typedef enum {
+    APP_PROTO_NONE = 0,
+    APP_PROTO_HTTP,
+    APP_PROTO_MAX
+}APP_PROTOCOL_E;
+
 #pragma pack(1)
 
 /* Ethernet header */
@@ -87,8 +93,6 @@ typedef struct tcp_header {
     u_short  urgent_pointer; /* 16 bits */
 }tcp_header_t;
 
-
-
 /* udp header */
 typedef struct udp_header {
     u_short src_port; /* 16 bits */
@@ -97,6 +101,11 @@ typedef struct udp_header {
     u_short checksum; /* acknowledge number (16 bits) */
 }udp_header_t;
 
+
+typedef struct app_proto_data_s {
+    APP_PROTOCOL_E type;
+    void *data;
+}app_proto_data_t;
 
 #pragma pack()
 

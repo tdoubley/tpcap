@@ -3,7 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 
-
+#include "src/protocol/protocol.h"
+#include "src/protocol/app_proto.h"
 #include "src/protocol/http.h"
 #include "http-parser/http_parser.h"
 
@@ -77,6 +78,30 @@ int do_http_parser(u_char *data, uint32_t len)
     } else {
         return parsed;
     }
+}
+
+static void * app_http_parser_init(void)
+{
+    http_t *p = malloc(sizeof(http_t));
+    memset(p, 0, sizeof(http_t));
+
+    return p;
+}
+
+static int app_http_parser_deinit(void *http)
+{
+    return 0;
+}
+
+
+int http_parser_register(app_protocol_parser_t *parsers)
+{
+    app_protocol_parser_t *parser = &parsers[APP_PROTO_HTTP];
+
+    parser->type = APP_PROTO_HTTP;
+    parser->init = NULL;
+    parser->parser = do_http_parser;
+    parser->deinit = NULL;
 }
 
 

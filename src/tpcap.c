@@ -5,6 +5,7 @@
 
 #include "src/debug.h"
 #include "src/protocol/protocol.h"
+#include "src/protocol/app_proto.h"
 #include "tpcap/tpcap.h"
 #include "src/pcap/pcap_parser.h"
 

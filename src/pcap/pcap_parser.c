@@ -10,7 +10,19 @@
 
 #include "src/pcap/pcap_parser.h"
 #include "src/protocol/app_proto.h"
+#include "src/protocol/http.h"
 
+
+static app_protocol_parser_t g_app_protocol_parsers[APP_PROTO_MAX];
+
+static inline app_protocol_parser_t * get_parser_by_type(char type)
+{
+    if (type > APP_PROTO_NONE && type < APP_PROTO_MAX) {
+        return NULL;
+    }
+
+    return &g_app_protocol_parsers[type];
+}
 
 static int eth_analyse(pcap_t *pcap, u_char *packet, uint32_t len, eth_packet_node_t *eth_packet);
 static int ip_analyse(pcap_t *pcap, u_char *packet, uint32_t len, ip_packet_node_t *ip_packet);
@@ -27,6 +39,40 @@ static void print_arr(char *prefix, u_char *data, uint32_t len)
         printf("%02x", data[i]);
     }
     printf("\n================================================\n");
+}
+static int register_app_praser(app_protocol_parser_t *parser_in, app_protocol_parser_t *parser_out)
+{
+    memcpy(parser_out, parser_in, sizeof(app_protocol_parser_t));
+
+    return 0;
+}
+
+static int reset_app_proto_parsers()
+{
+    int i = 0;
+    for (i = 0; i < APP_PROTO_MAX; i++) {
+        g_app_protocol_parsers[i].type = APP_PROTO_NONE;
+    }
+}
+
+
+pcap_t *pcap_init()
+{
+    int ret = 0;
+
+    reset_app_proto_parsers();
+
+    /*  */
+    ret |= http_parser_register(g_app_protocol_parsers); // register_app_praser(http_parser, &app_protocol_parsers[APP_PROTO_HTTP]);
+
+    pcap_t *pcap = (pcap_t *)malloc(sizeof(pcap_t));
+    if (pcap == NULL) {
+        return NULL;
+    }
+    memset(pcap, 0, sizeof(pcap_t));
+    DEBUG_PRINT("%s", "setp1\n");
+
+    return pcap;
 }
 
 int pcap_parser(pcap_t *pcap, const char *path) {
@@ -135,9 +181,6 @@ static int eth_analyse(pcap_t *pcap, u_char *packet, uint32_t len, eth_packet_no
     eth_packet->pdata = (packet + ETH_HEADER_LENGTH);
     eth_packet->len   = len - ETH_HEADER_LENGTH;
 
-    
-
-
     switch (header->proto) {
         case ETH_P_ARP:
         {}
@@ -237,18 +280,17 @@ static int tcp_analyse(pcap_t *pcap, u_char *packet, uint32_t len, tcp_packet_no
     /* 应用层协议处理 */
     print_arr("apppacket", tcp_packet->pdata, tcp_packet->len);
     APP_PROTOCOL_E type = tcp_app_proto_recognize(header, tcp_packet->pdata, tcp_packet->len);
-    switch (type)
-    {
-         case APP_PROTO_NONE:
-             break;
-         case APP_PROTO_HTTP:
-             do_http_parser(tcp_packet->pdata, tcp_packet->len);
-             break;
-         case APP_PROTO_MAX:
-         default:
-             DEBUG_ASSERT(0);
-             break;
+
+    app_protocol_parser_t *parser = get_parser_by_type(type);
+    if (parser != NULL && parser->type > APP_PROTO_NONE && parser->type < APP_PROTO_MAX) {
+        int ret = 0;
+        void *app_data = parser->init();
+        ret = parser->parser(tcp_packet->pdata, tcp_packet->len);
+        if (ret >= 0) {
+            tcp_packet->app_data = app_data;
+        }
     }
+
     return 0;
 }
 

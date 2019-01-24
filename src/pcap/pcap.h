@@ -89,6 +89,7 @@ typedef struct tcp_packet_node {
     tcp_header_t *header;
     u_char       *pdata;
     uint32_t      len;
+    app_proto_data_t *app_data;
     struct tcp_packet_node *next;
 }tcp_packet_node_t;
 
@@ -97,6 +98,7 @@ typedef struct udp_packet_node {
     udp_header_t *header;
     u_char       *pdata;
     uint32_t      len;
+    app_proto_data_t *app_data;
     struct udp_packet_node *next;
 }udp_packet_node_t;
 

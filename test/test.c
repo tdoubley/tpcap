@@ -8,7 +8,8 @@ int main()
     int count = 0;
     pcap_t *pcap;
 
-    tpcap_create(&pcap);
+    //tpcap_create(&pcap);
+    pcap  = pcap_init();
     count = pcap_parser(pcap, "test.pcap");
     printf("packet count: %d\n", count);
     pcap_analyse(pcap);
