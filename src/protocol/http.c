@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "src/protocol/protocol.h"
+#include "tpcap/protocol.h"
 #include "src/protocol/app_proto.h"
 #include "src/protocol/http.h"
 #include "http-parser/http_parser.h"
@@ -94,9 +94,11 @@ static int app_http_parser_deinit(void *http)
 }
 
 
-int http_parser_register(app_protocol_parser_t *parsers)
+int http_parser_register(app_protocol_parser_t *parser)
 {
-    app_protocol_parser_t *parser = &parsers[APP_PROTO_HTTP];
+    if (parser == NULL) {
+        return -1;
+    }
 
     parser->type = APP_PROTO_HTTP;
     parser->init = NULL;

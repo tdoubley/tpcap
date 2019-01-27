@@ -20,6 +20,6 @@ typedef struct http {
     str_t body;
 }http_t;
 
-int http_parser_register(app_protocol_parser_t *parsers);
+int http_parser_register(app_protocol_parser_t *parser);
 
 #endif // _SRC_PROTOCOL_HTTP_H_

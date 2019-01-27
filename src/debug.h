@@ -1,5 +1,5 @@
-#ifndef _HEADERS_DEBUG_H_
-#define _HEADERS_DEBUG_H_
+#ifndef _TPACP_SRC_DEBUG_H_
+#define _TPACP_SRC_DEBUG_H_
 
 #ifndef NO_DEBUG
 #define DEBUG_PRINT(fmt, ...) \
@@ -27,4 +27,5 @@
 #endif
 
 
-#endif /* end of _HEADERS_DEBUG_H_ */
+
+#endif /* _TPACP_SRC_DEBUG_H_ */

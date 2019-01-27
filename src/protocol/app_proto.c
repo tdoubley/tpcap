@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
-#include "src/protocol/protocol.h"
+#include "tpcap/protocol.h"
 #include "src/protocol/app_proto.h"
 
 int tcp_app_proto_recognize(tcp_header_t *header, u_char *data, int len)
